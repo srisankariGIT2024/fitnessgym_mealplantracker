@@ -209,23 +209,18 @@ app.put('/foods/delete/:id', async (req, res) => {
 // Fetch the diet tracker data and populate food details
 app.get('/diet-tracker', async (req, res) => {
     try {
-        const dietTrackerData = await DietTracker.find({})
+        const dietData = await DietTracker.find({})
             .populate({
-                path: 'foodItems.foodItem', // The reference field in the DietTracker schema
-                model: 'list_of_foods', // The model you're referencing to
-                select: 'foodName calories' // Fields to return from ListOfFoods
-            });
+                path: 'foodItems.foodItem',
+                model: 'list_of_foods',
+                select: 'foodName calories'
+            })
+            .lean(); // Convert Mongoose documents to plain JavaScript objects
 
-        if (dietTrackerData.length === 0) {
-            return res.status(404).json({ message: 'No diet data found' });
-        }
-
-        console.log('Diet Tracker Data:', dietTrackerData); // For debugging purposes
-
-        res.json(dietTrackerData); // Send the diet tracker data with populated food details
-    } catch (err) {
-        console.error('Error fetching diet data:', err);
-        res.status(500).json({ message: 'Error fetching data' });
+        res.json(dietData);
+    } catch (error) {
+        console.error('Error fetching diet data:', error);
+        res.status(500).send('Internal Server Error');
     }
 });
 

@@ -17,7 +17,10 @@ const dietTrackerSchema = new mongoose.Schema({
     },
     foodItems: [
         {
-            foodItem: { type: mongoose.Schema.Types.ObjectId, ref: 'list_of_foods' },
+            foodItem: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'list_of_foods'  // Reference to the list_of_foods model
+            },
             consumedSize: {
                 type: Number,
                 required: true,
@@ -50,6 +53,6 @@ const dietTrackerSchema = new mongoose.Schema({
     },
 });
 
-const dietTracker = mongoose.model('diet-trackers', dietTrackerSchema);
+const dietTracker = mongoose.model('diet_trackers', dietTrackerSchema);
 
 export default dietTracker;

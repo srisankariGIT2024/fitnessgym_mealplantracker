@@ -16,6 +16,7 @@
     "mongoose": "^6.13.5",
     "react": "^19.0.0",
     "react-calendar": "^5.1.0",
+    "react-datepicker": "^7.6.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.4.0",
     "react-native-calendars": "^1.1308.0",

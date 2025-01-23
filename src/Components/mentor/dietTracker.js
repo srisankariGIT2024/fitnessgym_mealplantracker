@@ -1,97 +1,103 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import MentorSidebar from './mentorSidebar';
 
-const DietTrackerCalendar = () => {
-  const [dietData, setDietData] = useState([]); // State to store diet data
-  const [loading, setLoading] = useState(true); // State to handle loading state
+const DietTracker = () => {
+  const [dietList, setDietList] = useState([]);
 
-  // Fetch the data from the API when the component is mounted
   useEffect(() => {
-    const fetchDietData = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/diet-tracker");
-        const data = await response.json();
-        setDietData(data); // Store the data in the state
-        setLoading(false); // Set loading to false after data is fetched
+        const response = await axios.get('http://localhost:5000/diet-tracker');
+        console.log("Fetched Diet Data:", response.data); // Check if data is fetched correctly
+        setDietList(response.data); // Update the state with the fetched data
       } catch (error) {
-        console.error("Error fetching diet data:", error);
-        setLoading(false);
+        console.error('Error fetching diet data:', error);
       }
     };
 
-    fetchDietData();
-  }, []); // Empty dependency array ensures the effect runs only once when the component is mounted
+    fetchData();
+  }, []);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const timelineItems = [
+    { time: "08:30 AM" },
+    { time: "12:30 PM" },
+    { time: "06:00 PM" },
+  ];
 
-  // Helper function to render the calendar grid
-  const renderCalendar = () => {
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth(); // Get the current month
-    const currentYear = currentDate.getFullYear(); // Get the current year
-
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // Get the number of days in the current month
-    const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); // Get the starting weekday of the month
-
-    const calendarDays = [];
-    let day = 1;
-
-    // Fill in the grid with empty cells until the first day of the month
-    for (let i = 0; i < firstDayOfMonth; i++) {
-      calendarDays.push(<div className="empty-day" key={`empty-${i}`} />);
+  const getFoodSectionBackground = (time) => {
+    if (time === "08:30 AM") {
+      return "#FDFDEA";
+    } else if (time === "12:30 PM") {
+      return "#C3DDFD";
+    } else if (time === "06:00 PM") {
+      return "#E3F9E5";
     }
-
-    // Fill in the calendar days with actual dates
-    for (let i = firstDayOfMonth; i < 7 * 6 && day <= daysInMonth; i++) {
-      const dayDietData = dietData.filter(
-        (item) => new Date(item.consumedAt).getDate() === day // Match date
-      );
-
-      // Display the calendar cell for each day
-      calendarDays.push(
-        <div
-          key={day}
-          className="calendar-day p-4 border border-gray-200 rounded-md relative"
-        >
-          <div className="day-number text-lg font-bold text-center">{day}</div>
-
-          {dayDietData.length > 0 ? (
-            <div className="diet-info mt-2">
-              {dayDietData.map((data, index) => (
-                <div key={index} className="meal-info text-xs">
-                  <strong>{data.time}</strong>
-                  <ul className="list-disc pl-4">
-                    {data.foodItems.map((food, idx) => (
-                      <li key={idx}>
-                        {food.foodItem ? food.foodItem.foodName : "Unknown Food"} -{" "}
-                        {food.consumedSize} {food.consumedSizeUnit}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-xs text-center text-gray-400">No meals</div>
-          )}
-        </div>
-      );
-
-      day++;
-    }
-
-    return calendarDays;
+    return "#FFFFFF";
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6 text-center">Diet Tracker Calendar</h1>
-      <div className="calendar grid grid-cols-7 gap-4">
-        {renderCalendar()}
+    <>
+      <MentorSidebar />
+      <div className="p-4 sm:ml-64">
+        <div className="p-4 dark:border-gray-700 mt-14">
+          <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center mb-4">
+              <h1 className="text-2xl font-bold text-indigo-800 dark:text-indigo-800">
+                Diet Tracker
+              </h1>
+            </div>
+
+            {timelineItems.map((item, index) => (
+              <div key={index} className="flex gap-x-3 mb-6">
+                <div className="w-16 text-end">
+                  <span className="text-sm text-red-700 dark:text-red-300">
+                    {item.time}
+                  </span>
+                </div>
+                {/* Add your icon component here */}
+                <div className="relative last:after:hidden after:absolute after:top-7 after:bottom-0 after:start-3.5 after:w-px after:-translate-x-[0.5px] after:bg-indigo-200 dark:after:bg-indigo-700">
+                  <div className="relative z-10 size-7 flex justify-center items-center">
+                    <div className="size-2 rounded-full bg-red-500 dark:bg-red-600"></div>
+                  </div>
+                </div>
+                <div
+                  className="grow p-4 rounded-lg"
+                  style={{ backgroundColor: getFoodSectionBackground(item.time) }}
+                >
+                  <h3 className="flex gap-x-1.5 font-semibold text-red-600 dark:text-red-400">
+                    Meal Consumed
+                  </h3>
+
+                  {dietList.length > 0 ? (
+                    <div>
+                      {dietList
+                        .filter((entry) => entry.time === item.time) // Filter based on the time field
+                        .map((entry, entryIndex) => (
+                          <div key={entryIndex} className="mt-2">
+                            {entry.foodItems.map((foodItem, foodItemIndex) => (
+                              <div key={foodItemIndex}>
+                                {foodItem.foodItem && (
+                                  <p className="text-sm text-gray-800 dark:text-gray-800">
+                                    <strong>{foodItem.foodItem.foodName}</strong> - {foodItem.foodItem.calories} Calories
+                                  </p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ))}
+                    </div>
+                  ) : (
+                    <p>No meals recorded for this time slot.</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
-export default DietTrackerCalendar;
+export default DietTracker;

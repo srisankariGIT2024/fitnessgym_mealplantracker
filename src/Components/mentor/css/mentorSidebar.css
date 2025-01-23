@@ -1,0 +1,40 @@
+.timeline-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.header {
+  margin-bottom: 20px;
+}
+
+.date-picker {
+  margin-top: 10px;
+}
+
+.timeline {
+  margin-top: 30px;
+}
+
+.timeline-entry {
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.food-item {
+  padding-left: 20px;
+}
+
+.food-item p {
+  margin: 5px 0;
+}
+
+h1 {
+  font-size: 28px;
+}
+
+h2 {
+  font-size: 20px;
+  color: #555;
+}
